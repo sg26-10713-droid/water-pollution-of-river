@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글로벌 수질 오염 평가 시스템</title>
+    
+    <!-- 폰트 로드 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind 설정 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 커스텀 스타일 */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- 헤더 -->
+    <header class="bg-white shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg class="w-8 h-8 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">글로벌 수질 오염 평가 시스템</h1>
+            </div>
+            <p class="text-sm text-slate-500 hidden sm:block">환경정책기본법 수질환경기준 기반</p>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- 설명 섹션 -->
+        <div class="mb-8 text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">강의 건강 상태를 확인하세요</h2>
+            <p class="text-slate-600 leading-relaxed">
+                지도에서 측정 위치를 선택하고 확보하신 수질 데이터(DO, BOD, COD 등)를 입력해주세요. 
+                측정하지 못한 항목은 비워두셔도 됩니다. 환경부 기준 및 최신 연구 자료를 바탕으로 종합적인 수질 등급을 분석해 드립니다.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- 왼쪽: 단계 1 (강 이름 입력) & 단계 2 (입력 폼) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- 단계 1: 강 이름 입력 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold text-sm">1</span>
+                        <h3 class="text-lg font-semibold">평가할 강 이름 입력</h3>
+                    </div>
+                    <div class="p-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-1" for="input-river-name">
+                            강 또는 하천 이름
+                        </label>
+                        <input type="text" id="input-river-name" placeholder="예: 한강, 낙동강, Thames River 등" 
+                            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                    </div>
+                </div>
+
+                <!-- 단계 2: 수질 데이터 입력 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold text-sm">2</span>
+                        <h3 class="text-lg font-semibold">측정 항목 입력</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-slate-500 mb-6">측정된 데이터만 입력하세요. 미측정 항목은 공란으로 남겨두시면 평가에서 제외됩니다.</p>
+                        
+                        <form id="water-form" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            
+                            <!-- DO 입력 -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-do">
+                                    DO (용존산소량) <span class="text-xs text-slate-400 font-normal ml-1">mg/L</span>
+                                </label>
+                                <input type="number" step="any" id="input-do" placeholder="예: 7.5" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- BOD 입력 -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-bod">
+                                    BOD (생물화학적 산소요구량) <span class="text-xs text-slate-400 font-normal ml-1">mg/L</span>
+                                </label>
+                                <input type="number" step="any" id="input-bod" placeholder="예: 1.5" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- COD 입력 -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-cod">
+                                    COD (화학적 산소요구량) <span class="text-xs text-slate-400 font-normal ml-1">mg/L</span>
+                                </label>
+                                <input type="number" step="any" id="input-cod" placeholder="예: 3.0" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- SS 입력 -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-ss">
+                                    SS (부유물질량) <span class="text-xs text-slate-400 font-normal ml-1">mg/L</span>
+                                </label>
+                                <input type="number" step="any" id="input-ss" placeholder="예: 15" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- pH 입력 -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-ph">
+                                    pH (수소이온농도)
+                                </label>
+                                <input type="number" step="any" id="input-ph" placeholder="예: 7.2" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- TDS 입력 -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-tds">
+                                    TDS (총용존고형물) <span class="text-xs text-slate-400 font-normal ml-1">mg/L</span>
+                                </label>
+                                <input type="number" step="any" id="input-tds" placeholder="예: 120" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- US/CM 입력 -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-uscm">
+                                    US/CM (전기전도도) <span class="text-xs text-slate-400 font-normal ml-1">µS/cm</span>
+                                </label>
+                                <input type="number" step="any" id="input-uscm" placeholder="예: 250" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- 경고 메시지 표시용 (alert 대체) -->
+                            <div id="form-message" class="md:col-span-2 text-sm text-red-500 hidden bg-red-50 p-3 rounded-lg border border-red-100">
+                                최소 하나 이상의 측정 항목을 입력해주세요.
+                            </div>
+
+                            <!-- 평가 버튼 -->
+                            <div class="md:col-span-2 mt-4">
+                                <button type="button" onclick="runEvaluation()" 
+                                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    수질 오염도 분석 및 평가하기
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 단계 3 (평가 결과) -->
+            <div class="lg:col-span-5 relative">
+                
+                <!-- 결과 컨테이너 (초기에는 안내 문구 표시) -->
+                <div id="result-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden sticky top-8 h-full min-h-[600px] flex flex-col">
+                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold text-sm">3</span>
+                        <h3 class="text-lg font-semibold">평가 결과 보고서</h3>
+                    </div>
+                    
+                    <!-- 초기 상태 뷰 -->
+                    <div id="result-empty" class="flex-grow flex flex-col items-center justify-center p-8 text-center text-slate-400">
+                        <svg class="w-16 h-16 mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p>좌측 폼에 데이터를 입력하고<br>분석 버튼을 클릭하면 결과가 표시됩니다.</p>
+                    </div>
+
+                    <!-- 결과 표시 뷰 (초기엔 숨김) -->
+                    <div id="result-content" class="hidden flex-grow flex flex-col p-6 overflow-y-auto fade-in">
+                        
+                        <!-- 총평 등급 표시 영역 -->
+                        <div class="text-center mb-8">
+                            <h4 id="result-river-title" class="text-xl font-bold text-brand-900 mb-3"><!-- JS로 채워짐 --></h4>
+                            <h5 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">종합 수질 등급</h5>
+                            <div id="final-grade-badge" class="inline-flex items-center justify-center px-6 py-3 rounded-full text-2xl font-bold text-white shadow-lg mb-3">
+                                <!-- JS로 채워짐 -->
+                            </div>
+                            <p id="final-grade-desc" class="text-slate-600 text-sm px-4 leading-relaxed mb-5">
+                                <!-- JS로 채워짐 -->
+                            </p>
+                            
+                            <!-- 참고 문헌 명시 알림창 -->
+                            <div class="inline-block bg-brand-50 border border-brand-100 rounded-lg p-3.5 text-xs text-brand-800 text-left max-w-md mx-auto shadow-sm">
+                                <span class="font-bold flex items-center gap-1 mb-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    평가 참고 기준:
+                                </span>
+                                본 결과는 <strong>환경정책기본법 시행령 [별표 1] 환경기준</strong>, <strong>'25년 도심 친수하천 측정망 운영결과 보고서</strong> 및 <strong>WHO 수질 기준</strong>을 종합 분석하여 도출되었습니다.
+                            </div>
+                        </div>
+
+                        <hr class="border-slate-100 mb-6">
+
+                        <!-- 세부 항목 평가 리스트 -->
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                항목별 상세 분석
+                            </h4>
+                            <div id="details-list" class="space-y-3">
+                                <!-- JS로 동적 생성됨 -->
+                            </div>
+                        </div>
+
+                        <!-- 출처 표기 -->
+                        <div class="mt-auto pt-8">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-500 space-y-1">
+                                <p class="font-semibold text-slate-600 mb-1">참고 문헌 (평가 기준):</p>
+                                <p>1. [별표 1] 환경기준(제2조 관련)(환경정책기본법 시행령)</p>
+                                <p>2. '25년 1월 도심 친수하천 측정망 운영결과 (경상북도 보건환경연구원)</p>
+                                <p>3. 세계보건기구(WHO) TDS 수질 기준</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm">
+        <p>© 2026 Water Quality Evaluator. Designed for environmental monitoring.</p>
+    </footer>
+
+    <!-- 자바스크립트 로직 -->
+    <script>
+        // 1. 수질 평가 메인 함수
+        function runEvaluation() {
+            // 메시지 초기화
+            const msgBox = document.getElementById('form-message');
+            msgBox.classList.add('hidden');
+
+            // 강 이름 가져오기
+            const riverNameInput = document.getElementById('input-river-name').value.trim();
+            const riverName = riverNameInput !== '' ? riverNameInput : '이름 없는 강';
+
+            // 입력값 가져오기
+            const data = {
+                DO: document.getElementById('input-do').value,
+                BOD: document.getElementById('input-bod').value,
+                COD: document.getElementById('input-cod').value,
+                SS: document.getElementById('input-ss').value,
+                pH: document.getElementById('input-ph').value,
+                TDS: document.getElementById('input-tds').value,
+                USCM: document.getElementById('input-uscm').value
+            };
+
+            // 빈 값 확인
+            const hasData = Object.values(data).some(val => val.trim() !== '');
+            if (!hasData) {
+                msgBox.innerText = '최소 하나 이상의 수질 항목(숫자)을 입력해주셔야 평가가 가능합니다.';
+                msgBox.classList.remove('hidden');
+                return;
+            }
+
+            // 분석 로직 실행
+            const evaluationResult = analyzeWaterQuality(data);
+            evaluationResult.riverName = riverName; // 강 이름 추가
+            
+            // 결과 화면 렌더링
+            renderResults(evaluationResult);
+        }
+
+        // 2. 환경부 기준에 따른 데이터 분석 로직
+        // 평가 기준: 5 (매우 좋음), 4 (좋음), 3 (보통), 2 (나쁨), 1 (매우 나쁨)
+        function analyzeWaterQuality(data) {
+            let scores = [];
+            let details = [];
+
+            // 1. pH (수소이온농도) 평가
+            if (data.pH) {
+                let ph = parseFloat(data.pH);
+                if (ph >= 6.5 && ph <= 8.5) {
+                    scores.push(5);
+                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '자연 상태에 가까운 최적의 수소이온농도입니다. (기준: 6.5~8.5)' });
+                } else if (ph >= 6.0 && ph <= 8.5) {
+                    scores.push(3);
+                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '보통 수준의 수치이나 주의가 필요할 수 있습니다. (기준: 6.0~8.5)' });
+                } else {
+                    scores.push(1);
+                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '생태계에 악영향을 미치는 강산성 또는 강알칼리성입니다.' });
+                }
+            }
+
+            // 2. BOD (생물화학적 산소요구량) 평가
+            if (data.BOD) {
+                let bod = parseFloat(data.BOD);
+                if (bod <= 1) {
+                    scores.push(5); details.push({ name: 'BOD', val: bod + ' mg/L', status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '오염물질이 없는 청정상태의 생태계입니다.' });
+                } else if (bod <= 3) {
+                    scores.push(4); details.push({ name: 'BOD', val: bod + ' mg/L', status: '좋음', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-50', desc: '일반적인 정수처리 후 생활용수로 사용 가능한 맑은 물입니다.' });
+                } else if (bod <= 5) {
+                    scores.push(3); details.push({ name: 'BOD', val: bod + ' mg/L', status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '고도의 정수처리 후 생활용수 및 공업용수로 사용 가능한 보통 수준입니다.' });
+                } else if (bod <= 10) {
+                    scores.push(2); details.push({ name: 'BOD', val: bod + ' mg/L', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '다량의 오염물질로 인해 특수한 처리 없이는 사용이 어렵습니다.' });
+                } else {
+                    scores.push(1); details.push({ name: 'BOD', val: bod + ' mg/L', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '용존산소가 고갈되어 물고기가 살기 어려운 고도 오염상태입니다.' });
+                }
+            }
+
+            // 3. COD (화학적 산소요구량) 평가
+            if (data.COD) {
+                let cod = parseFloat(data.COD);
+                if (cod <= 2) {
+                    scores.push(5); details.push({ name: 'COD', val: cod + ' mg/L', status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '난분해성 유기물이 매우 적은 깨끗한 상태입니다.' });
+                } else if (cod <= 5) {
+                    scores.push(4); details.push({ name: 'COD', val: cod + ' mg/L', status: '좋음', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-50', desc: '양호한 수준의 하천 생태계를 유지하고 있습니다.' });
+                } else if (cod <= 7) {
+                    scores.push(3); details.push({ name: 'COD', val: cod + ' mg/L', status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '유기물 오염도가 다소 진행된 보통 상태입니다.' });
+                } else if (cod <= 11) {
+                    scores.push(2); details.push({ name: 'COD', val: cod + ' mg/L', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '화학적 산소요구량이 높아 공업용수 수준입니다.' });
+                } else {
+                    scores.push(1); details.push({ name: 'COD', val: cod + ' mg/L', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '심각한 수질 오염으로 인해 생태계 복원이 시급합니다.' });
+                }
+            }
+
+            // 4. DO (용존산소량) 평가
+            if (data.DO) {
+                let do_val = parseFloat(data.DO);
+                if (do_val >= 7.5) {
+                    scores.push(5); details.push({ name: 'DO', val: do_val + ' mg/L', status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '물 속에 산소가 풍부하게 녹아있어 생물이 살기에 완벽합니다.' });
+                } else if (do_val >= 5.0) {
+                    scores.push(4); details.push({ name: 'DO', val: do_val + ' mg/L', status: '좋음/보통', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-50', desc: '생태계 유지를 위한 충분한 산소량을 확보하고 있습니다.' });
+                } else if (do_val >= 2.0) {
+                    scores.push(2); details.push({ name: 'DO', val: do_val + ' mg/L', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '산소가 부족하여 일부 수생 생물이 생존하기 어렵습니다.' });
+                } else {
+                    scores.push(1); details.push({ name: 'DO', val: do_val + ' mg/L', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '용존산소가 거의 고갈되어 물고기가 호흡할 수 없는 폐수 수준입니다.' });
+                }
+            }
+
+            // 5. SS (부유물질량) 평가
+            if (data.SS) {
+                let ss = parseFloat(data.SS);
+                if (ss <= 25) {
+                    scores.push(5); details.push({ name: 'SS', val: ss + ' mg/L', status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '부유물이 25mg/L 이하로 매우 맑고 투명합니다.' });
+                } else if (ss <= 100) {
+                    scores.push(2); details.push({ name: 'SS', val: ss + ' mg/L', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '흙탕물이나 침전물이 많아 탁도가 높습니다.' });
+                } else {
+                    // 환경부 기준 V등급(나쁨)에는 '쓰레기 등이 떠 있지 않을 것' 명시. 숫자로 극단적일시 매우 나쁨 처리.
+                    scores.push(1); details.push({ name: 'SS', val: ss + ' mg/L', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '부유물이 100mg/L을 초과하며 쓰레기 등이 섞여 있을 확률이 높습니다.' });
+                }
+            }
+
+            // 6. TDS (총용존고형물) 평가 (WHO 물맛 기준 참고)
+            if (data.TDS) {
+                let tds = parseFloat(data.TDS);
+                if (tds < 300) {
+                    scores.push(5); details.push({ name: 'TDS', val: tds + ' mg/L', status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '물맛이 아주 좋고 스케일 생성 우려가 없는 양질의 수질입니다.' });
+                } else if (tds <= 600) {
+                    scores.push(4); details.push({ name: 'TDS', val: tds + ' mg/L', status: '좋음', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-50', desc: '양호한 수준의 용존물질을 포함하고 있습니다.' });
+                } else if (tds <= 900) {
+                    scores.push(3); details.push({ name: 'TDS', val: tds + ' mg/L', status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '마실 수는 있으나 광물질 맛이 날 수 있는 일반적 수준입니다.' });
+                } else if (tds <= 1200) {
+                    scores.push(2); details.push({ name: 'TDS', val: tds + ' mg/L', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '음용수로는 적합하지 않으며, 이물질이 다량 용해되어 있습니다.' });
+                } else {
+                    scores.push(1); details.push({ name: 'TDS', val: tds + ' mg/L', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '농도가 매우 높아 생활 및 공업용수로 사용시 심각한 스케일을 유발합니다.' });
+                }
+            }
+
+            // 7. US/CM (전기전도도) 평가 (일반 담수 기준)
+            if (data.USCM) {
+                let uscm = parseFloat(data.USCM);
+                if (uscm < 500) {
+                    scores.push(5); details.push({ name: '전기전도도', val: uscm + ' µS/cm', status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '이온 성분이 적은 매우 깨끗한 하천 수준입니다.' });
+                } else if (uscm <= 1000) {
+                    scores.push(4); details.push({ name: '전기전도도', val: uscm + ' µS/cm', status: '좋음', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-50', desc: '일반적인 자연 하천에서 볼 수 있는 양호한 수치입니다.' });
+                } else if (uscm <= 2000) {
+                    scores.push(3); details.push({ name: '전기전도도', val: uscm + ' µS/cm', status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '무기물질이 다소 섞여 있으나 심각한 오염은 아닙니다.' });
+                } else if (uscm <= 3000) {
+                    scores.push(2); details.push({ name: '전기전도도', val: uscm + ' µS/cm', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '산업 폐수나 해수의 유입을 의심할 수 있는 높은 수치입니다.' });
+                } else {
+                    scores.push(1); details.push({ name: '전기전도도', val: uscm + ' µS/cm', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '전기가 매우 잘 통하는 극심한 무기물 오염 상태입니다.' });
+                }
+            }
+
+            // 평균 점수 계산을 통해 종합 등급 도출
+            let sum = scores.reduce((a, b) => a + b, 0);
+            let avg = sum / scores.length;
+
+            let finalGrade = '';
+            let finalColorClass = '';
+            let finalDesc = '';
+
+            if (avg >= 4.5) {
+                finalGrade = '매우 좋음 (Ia)';
+                finalColorClass = 'bg-blue-500';
+                finalDesc = '측정된 모든 항목이 최상위권입니다. 용존산소가 풍부하고 오염물질이 없는 청정 생태계로, 간단한 정수 후 식수로도 활용 가능한 훌륭한 수질입니다.';
+            } else if (avg >= 3.5) {
+                finalGrade = '좋음 (Ib ~ II)';
+                finalColorClass = 'bg-teal-500';
+                finalDesc = '전반적으로 양호한 상태입니다. 용존산소가 많고 오염이 적어 일반적인 정수 처리로 생활용수나 수영용수로 사용할 수 있는 건강한 생태계입니다.';
+            } else if (avg >= 2.5) {
+                finalGrade = '보통 (III)';
+                finalColorClass = 'bg-green-500';
+                finalDesc = '일반적인 강에서 흔히 볼 수 있는 수질입니다. 오염물질이 일부 섞여 있어 생물학적 처리가 필요하며, 고도 정수 후 생활용수나 공업용수로 적합합니다.';
+            } else if (avg >= 1.5) {
+                finalGrade = '나쁨 (IV ~ V)';
+                finalColorClass = 'bg-orange-500';
+                finalDesc = '주의가 필요한 수질입니다. 오염물질이 다량 존재하여 수생 생태계가 위협받고 있으며 농업용수나 고도 처리 후의 공업용수로 제한적으로 사용해야 합니다.';
+            } else {
+                finalGrade = '아주 나쁨 (VI)';
+                finalColorClass = 'bg-red-600';
+                finalDesc = '심각한 오염 상태입니다! 용존산소가 고갈되어 생물이 생존하기 어렵고, 수생태계가 파괴된 폐수 수준으로 적극적인 수질 정화 정책이 시급합니다.';
+            }
+
+            return { finalGrade, finalColorClass, finalDesc, details };
+        }
+
+        // 3. 결과를 화면에 렌더링하는 함수
+        function renderResults(result) {
+            // UI 스왑 (초기화면 숨기고 결과화면 표시)
+            document.getElementById('result-empty').classList.add('hidden');
+            document.getElementById('result-content').classList.remove('hidden');
+
+            // 강 이름 렌더링
+            document.getElementById('result-river-title').innerText = `[ ${result.riverName} ] 수질 평가 결과`;
+
+            // 총평 렌더링
+            const badge = document.getElementById('final-grade-badge');
+            // 기존 색상 클래스 초기화
+            badge.className = 'inline-flex items-center justify-center px-6 py-3 rounded-full text-2xl font-bold text-white shadow-lg mb-3';
+            badge.classList.add(result.finalColorClass);
+            badge.innerText = result.finalGrade;
+            
+            document.getElementById('final-grade-desc').innerText = result.finalDesc;
+
+            // 상세 내역 렌더링
+            const detailsList = document.getElementById('details-list');
+            detailsList.innerHTML = ''; // 기존 내용 지우기
+
+            result.details.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border ${item.bg} border-slate-200 transition duration-200 hover:shadow-md`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-semibold text-slate-800">${item.name}</span>
+                        <span class="px-2.5 py-1 rounded text-xs font-bold ${item.color} text-white shadow-sm">${item.status}</span>
+                    </div>
+                    <div class="flex items-baseline gap-2 mb-1">
+                        <span class="text-xl font-bold ${item.text}">${item.val}</span>
+                    </div>
+                    <p class="text-sm text-slate-600">${item.desc}</p>
+                `;
+                detailsList.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
