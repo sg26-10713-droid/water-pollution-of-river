@@ -152,11 +152,20 @@
                             </div>
 
                             <!-- US/CM 입력 -->
-                            <div class="md:col-span-2">
+                            <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1" for="input-uscm">
                                     US/CM (전기전도도) <span class="text-xs text-slate-400 font-normal ml-1">µS/cm</span>
                                 </label>
                                 <input type="number" step="any" id="input-uscm" placeholder="예: 250" 
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+                            </div>
+
+                            <!-- 탁도 입력 -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1" for="input-turbidity">
+                                    탁도 (Turbidity) <span class="text-xs text-slate-400 font-normal ml-1">NTU</span>
+                                </label>
+                                <input type="number" step="any" id="input-turbidity" placeholder="예: 3.5" 
                                     class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
                             </div>
 
@@ -271,7 +280,8 @@
                 SS: document.getElementById('input-ss').value,
                 pH: document.getElementById('input-ph').value,
                 TDS: document.getElementById('input-tds').value,
-                USCM: document.getElementById('input-uscm').value
+                USCM: document.getElementById('input-uscm').value,
+                Turbidity: document.getElementById('input-turbidity').value
             };
 
             // 빈 값 확인
@@ -399,6 +409,22 @@
                     scores.push(2); details.push({ name: '전기전도도', val: uscm + ' µS/cm', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '산업 폐수나 해수의 유입을 의심할 수 있는 높은 수치입니다.' });
                 } else {
                     scores.push(1); details.push({ name: '전기전도도', val: uscm + ' µS/cm', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '전기가 매우 잘 통하는 극심한 무기물 오염 상태입니다.' });
+                }
+            }
+
+            // 8. 탁도(Turbidity) 평가 (먹는 물 및 하천 수질 기준 참고)
+            if (data.Turbidity) {
+                let turb = parseFloat(data.Turbidity);
+                if (turb <= 1) {
+                    scores.push(5); details.push({ name: '탁도 (Turbidity)', val: turb + ' NTU', status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '육안으로 보기에 매우 투명하며 먹는 물 기준(1 NTU 이하)을 만족하는 수준입니다.' });
+                } else if (turb <= 5) {
+                    scores.push(4); details.push({ name: '탁도 (Turbidity)', val: turb + ' NTU', status: '좋음', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-50', desc: '비교적 맑은 상태로, 일반적인 하천에서 양호한 수치입니다.' });
+                } else if (turb <= 10) {
+                    scores.push(3); details.push({ name: '탁도 (Turbidity)', val: turb + ' NTU', status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '약간의 부유물이 있어 미세하게 흐린 보통의 상태입니다.' });
+                } else if (turb <= 50) {
+                    scores.push(2); details.push({ name: '탁도 (Turbidity)', val: turb + ' NTU', status: '나쁨', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', desc: '탁도가 높아 흙탕물처럼 보일 수 있으며, 수생 식물의 광합성을 방해합니다.' });
+                } else {
+                    scores.push(1); details.push({ name: '탁도 (Turbidity)', val: turb + ' NTU', status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '빛이 통과하지 못할 정도로 매우 탁하며 심각한 수질 오염을 나타냅니다.' });
                 }
             }
 
