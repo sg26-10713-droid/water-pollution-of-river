@@ -309,15 +309,29 @@
             // 1. pH (수소이온농도) 평가
             if (data.pH) {
                 let ph = parseFloat(data.pH);
+                
+                // 사용자가 제시한 산성/염기성 세부 기준에 따른 설명 생성
+                let customDesc = "";
+                if (ph < 4) {
+                    customDesc = '배터리 용액, 위액, 레몬즙 등과 유사한 강산성(pH 0~3) 상태로 수생태계에 치명적입니다.';
+                } else if (ph < 6.0) {
+                    customDesc = '커피, 우유 등과 유사한 약산성(pH 4~6) 상태입니다. 환경기준 하한선(6.0)에 미달하여 수생태계에 악영향을 줍니다.';
+                } else if (ph > 8.5 && ph <= 10.5) {
+                    customDesc = '비누, 베이킹소다 등과 유사한 약염기성(pH 8~10) 상태입니다. 환경기준 상한선(8.5)을 초과하여 주의가 필요합니다.';
+                } else if (ph > 10.5) {
+                    customDesc = '암모니아수, 하수구 세척제 등과 유사한 강염기성(pH 11~14) 상태로 수생태계에 치명적입니다.';
+                }
+
                 if (ph >= 6.5 && ph <= 8.5) {
                     scores.push(5);
-                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: '자연 상태에 가까운 최적의 수소이온농도입니다. (기준: 6.5~8.5)' });
+                    let stateStr = (ph === 7) ? "순수한 물(증류수)과 같은 중성(pH 7)" : (ph < 7 ? "약산성에 가까운" : "약염기성에 가까운");
+                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '매우 좋음', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50', desc: `자연 상태에 가까운 최적의 수소이온농도입니다. (${stateStr}, 환경기준: 6.5~8.5)` });
                 } else if (ph >= 6.0 && ph <= 8.5) {
                     scores.push(3);
-                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '보통 수준의 수치이나 주의가 필요할 수 있습니다. (기준: 6.0~8.5)' });
+                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '보통', color: 'bg-green-500', text: 'text-green-700', bg: 'bg-green-50', desc: '우유, 녹차 등과 유사한 약산성(pH 6 부근)에 해당하는 턱걸이 수치로 지속적인 관리가 필요합니다. (환경기준: 6.0~8.5)' });
                 } else {
                     scores.push(1);
-                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: '생태계에 악영향을 미치는 강산성 또는 강알칼리성입니다.' });
+                    details.push({ name: 'pH (수소이온농도)', val: ph, status: '매우 나쁨', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-50', desc: customDesc });
                 }
             }
 
